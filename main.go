@@ -3,11 +3,12 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
-	"github.com/lordbyron/tls-scanner/scanners"
-	"github.com/spf13/pflag"
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/lordbyron/tls-scanner/scanners"
+	"github.com/spf13/pflag"
 )
 
 const (
@@ -81,6 +82,12 @@ func main() {
 }
 
 func makeScanners() (header []string, scans []scanners.Scanner) {
+	if !(checkSSL3 || checkTLS1 || checkTLS11 || checkTLS12) {
+		checkSSL3 = true
+		checkTLS1 = true
+		checkTLS11 = true
+		checkTLS12 = true
+	}
 	if checkSSL3 {
 		header = append(header, "ssl3")
 		scans = append(scans, scanners.NewTLSVersionScanner("ssl3"))
