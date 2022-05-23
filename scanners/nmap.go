@@ -3,9 +3,10 @@ package scanners
 import (
 	"bytes"
 	"fmt"
-	nmap "github.com/tomsteele/go-nmap"
 	"os"
 	"os/exec"
+
+	nmap "github.com/tomsteele/go-nmap"
 )
 
 type NmapScanner struct {
@@ -19,7 +20,7 @@ func NewNmapScanner(portStr string) NmapScanner {
 }
 
 func (s *NmapScanner) Scan(host string) ([]int, error) {
-	cmd := exec.Command("nmap", host, "--open", "-oX", "-", "-p", s.portStr)
+	cmd := exec.Command("nmap", host, "--open", "-oX", "-", "-Pn", "-p", s.portStr)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	err := cmd.Run()
