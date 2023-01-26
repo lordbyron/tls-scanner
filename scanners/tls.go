@@ -3,10 +3,12 @@ package scanners
 import (
 	"crypto/tls"
 	"fmt"
+	"os"
 )
 
 type TLSVersionScanner struct {
-	vers int
+	vers    int
+	versStr string
 }
 
 func NewTLSVersionScanner(vers string) TLSVersionScanner {
@@ -20,16 +22,20 @@ func NewTLSVersionScanner(vers string) TLSVersionScanner {
 		v = tls.VersionTLS11
 	case "tls1_2":
 		v = tls.VersionTLS12
+	case "tls1_3":
+		v = tls.VersionTLS13
 	default:
-		panic("tols version not recognized")
+		panic("tls version not recognized")
 	}
 	return TLSVersionScanner{
-		vers: v,
+		vers:    v,
+		versStr: vers,
 	}
 }
 
 func (s TLSVersionScanner) Scan(host string, port int) (bool, error) {
 	connStr := host + ":" + fmt.Sprint(port)
+	fmt.Printf("Testing %s %s\n", connStr, s.versStr)
 	_, err := tls.Dial("tcp", connStr, &tls.Config{
 		InsecureSkipVerify: true,
 		MinVersion:         uint16(s.vers),
@@ -38,6 +44,6 @@ func (s TLSVersionScanner) Scan(host string, port int) (bool, error) {
 	if err == nil {
 		return true, nil
 	}
-	//fmt.Fprintf(os.Stderr, "%s %s\n", connStr, err.Error())
+	fmt.Fprintf(os.Stderr, "%s %s\n", connStr, err.Error())
 	return false, nil
 }

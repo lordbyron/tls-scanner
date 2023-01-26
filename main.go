@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	portsDefault = "1-1000,8000-8999"
+	portsDefault = "443"
 )
 
 var hostsfile string
@@ -21,6 +21,7 @@ var checkSSL3 bool
 var checkTLS1 bool
 var checkTLS11 bool
 var checkTLS12 bool
+var checkTLS13 bool
 var portStr string
 
 func init() {
@@ -31,6 +32,7 @@ func init() {
 	pflag.BoolVarP(&checkTLS1, "tls1", "", false, "Test if host supports TLS 1.0")
 	pflag.BoolVarP(&checkTLS11, "tls1_1", "", false, "Test if host supports TLS 1.1")
 	pflag.BoolVarP(&checkTLS12, "tls1_2", "", false, "Test if host supports TLS 1.2")
+	pflag.BoolVarP(&checkTLS13, "tls1_3", "", false, "Test if host supports TLS 1.3")
 	pflag.Parse()
 
 	if host == "" && hostsfile == "" || host != "" && hostsfile != "" {
@@ -82,11 +84,12 @@ func main() {
 }
 
 func makeScanners() (header []string, scans []scanners.Scanner) {
-	if !(checkSSL3 || checkTLS1 || checkTLS11 || checkTLS12) {
+	if !(checkSSL3 || checkTLS1 || checkTLS11 || checkTLS12 || checkTLS13) {
 		checkSSL3 = true
 		checkTLS1 = true
 		checkTLS11 = true
 		checkTLS12 = true
+		checkTLS13 = true
 	}
 	if checkSSL3 {
 		header = append(header, "ssl3")
@@ -103,6 +106,10 @@ func makeScanners() (header []string, scans []scanners.Scanner) {
 	if checkTLS12 {
 		header = append(header, "tls1_2")
 		scans = append(scans, scanners.NewTLSVersionScanner("tls1_2"))
+	}
+	if checkTLS13 {
+		header = append(header, "tls1_3")
+		scans = append(scans, scanners.NewTLSVersionScanner("tls1_3"))
 	}
 	return
 }

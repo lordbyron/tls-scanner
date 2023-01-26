@@ -21,6 +21,7 @@ func NewNmapScanner(portStr string) NmapScanner {
 
 func (s *NmapScanner) Scan(host string) ([]int, error) {
 	cmd := exec.Command("nmap", host, "--open", "-oX", "-", "-Pn", "-p", s.portStr)
+	//fmt.Println(cmd)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	err := cmd.Run()
